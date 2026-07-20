@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 ИЖ-Шотер Pro: Паутина Прогресса</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: #f0f4f8; color: #1e293b; padding: 15px; display: flex; justify-content: center; }
+        .phone-wrapper { width: 100%; max-width: 480px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); overflow: hidden; display: flex; flex-direction: column; min-height: 92vh; }
+        header { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); color: #ffffff; text-align: center; padding: 20px 15px; border-bottom: 3px solid #3b82f6; }
+        header h1 { font-size: 22px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        header p { font-size: 13px; opacity: 0.9; }
+        .tabs { display: flex; background-color: #e2e8f0; padding: 4px; margin: 15px; border-radius: 12px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; border-radius: 8px; }
+        .tab-btn.active { background-color: #ffffff; color: #2563eb; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .tab-content { display: none; padding: 10px 15px 20px 15px; flex: 1; }
+        .tab-content.active { display: block; }
+        .section-title { font-size: 15px; font-weight: bold; color: #1e3a8a; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 15px; margin-bottom: 12px; }
+        
+        .calendar-picker { width: 100%; padding: 12px; border: 2px solid #2563eb; border-radius: 10px; font-size: 16px; font-weight: bold; color: #1e3a8a; outline: none; background: #fff; text-align: center; }
+        .skill-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+        .skill-header { display: flex; justify-content: space-between; align-items: center; }
+        .skill-name { font-weight: 600; font-size: 14px; }
+        .warmup-toggle { font-size: 11px; background-color: #cbd5e1; padding: 3px 8px; border-radius: 6px; color: #334155; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .warmup-toggle input { display: none; }
+        .warmup-toggle.active-warmup { background-color: #fecdd3; color: #9f1239; font-weight: bold; }
+        
+        .target-box { background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+        .target-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold; color: #2563eb; margin-bottom: 10px; }
+        .shots-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+        .shot-pair { display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 6px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .shot-input { width: 100%; padding: 4px; text-align: center; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 13px; font-weight: bold; outline: none; }
+        
+        .target-footer-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #64748b; background-color: #fff; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 8px; }
+        .btn-add-target { background-color: #e0f2fe; color: #0369a1; border: none; width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .btn-save-container { padding: 5px 15px 20px 15px; }
+        .btn-save { background: linear-gradient(90deg, #1d4ed8, #2563eb); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        
+        /* Стили новой нативной графики */
+        .native-chart-container { display: flex; flex-direction: column; gap: 10px; padding: 5px; }
+        .chart-row { display: flex; flex-direction: column; gap: 4px; }
+        .chart-label-container { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: #475569; }
+        .chart-bar-bg { width: 100%; background-color: #e2e8f0; height: 18px; border-radius: 6px; overflow: hidden; }
+        .chart-bar-fill { background: linear-gradient(90deg, #3b82f6, #1d4ed8); height: 100%; width: 0%; transition: width 0.4s ease; }
+        
+        /* Блок пафосной паутины */
+        .spider-wrapper { display: flex; justify-content: center; align-items: center; padding: 10px 0; }
+        .spider-canvas { background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; }
+
+        .predict-stat-box { display: flex; flex-direction: column; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 12px; font-size: 13px; color: #166534; margin-bottom: 15px; }
+        .history-item { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
+        .history-date { font-weight: bold; color: #1e3a8a; display: flex; justify-content: space-between; }
+        .history-details { color: #475569; font-size: 12px; margin-top: 5px; line-height: 1.4; }
+        .badge-warmup { background-color: #ffe4e6; color: #b91c1c; padding: 1px 5px; border-radius: 4px; font-size: 10px; }
+    </style>
+</head>
+<body>
+<div class="phone-wrapper">
+    <header>
+        <h1>🎯 ИЖ-Шотер Pro</h1>
+        <p>Система контроля техники и ментального баланса 🔫</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="btn-input" onclick="switchTab('input-tab')">✏️ Ввод данных</button>
+        <button class="tab-btn" id="btn-stats" onclick="switchTab('stats-tab')">📈 Статистика</button>
+    </div>
+
+    <div id="input-tab" class="tab-content active">
+        <div class="section-title">📅 Выберите дату тренировки</div>
+        <input type="date" id="trainDate" class="calendar-picker">
+
+        <div class="section-title">🧱 Работа над техникой (Оценка 1-10)</div>
+        <div class="card" id="skillsContainer">
+            <div class="skill-row" data-skill="holding">
+                <div class="skill-header"><span class="skill-name">🧱 Удержание (Холостая)</span>
+                <label class="warmup-toggle" onclick="toggleWarmupStyle(this)"><input type="checkbox" class="warmup-check">🔧 Пристрелка</label></div>
+                <select class="rating-select"><option value="">Не тренировал</option><script>for(let i=1;i<=10;i++) document.write(`<option value="${i}">${i}</option>`)</script></select>
+            </div>
+            <div class="skill-row" data-skill="sight">
+                <div class="skill-header"><span class="skill-name">👁 Ровная мушка (Обработка)</span>
+                <label class="warmup-toggle" onclick="toggleWarmupStyle(this)"><input type="checkbox" class="warmup-check">🔧 Пристрелка</label></div>
+                <select class="rating-select"><option value="">Не тренировал</option><script>for(let i=1;i<=10;i++) document.write(`<option value="${i}">${i}</option>`)</script></select>
+            </div>
+            <div class="skill-row" data-skill="trigger">
+                <div class="skill-header"><span class="skill-name">⚡ Спуск (Работа пальца)</span>
+                <label class="warmup-toggle" onclick="toggleWarmupStyle(this)"><input type="checkbox" class="warmup-check">🔧 Пристрелка</label></div>
+                <select class="rating-select"><option value="">Не тренировал</option><script>for(let i=1;i<=10;i++) document.write(`<option value="${i}">${i}</option>`)</script></select>
+            </div>
+            <div class="skill-row" data-skill="stance">
+                <div class="skill-header"><span class="skill-name">👣 Изготовка и Хват</span>
+                <label class="warmup-toggle" onclick="toggleWarmupStyle(this)"><input type="checkbox" class="warmup-check">🔧 Пристрелка</label></div>
+                <select class="rating-select"><option value="">Не тренировал</option><script>for(let i=1;i<=10;i++) document.write(`<option value="${i}">${i}</option>`)</script></select>
+            </div>
+        </div>
+
+        <div class="section-title">🔥 Огневые серии (Ввод Выстрел + Прогноз)</div>
+        <div id="targetsList"></div>
+        <button class="btn-add-target" onclick="addTargetRow()">➕ Добавить серию (10 выстрелов)</button>
+    </div>
+
+    <div id="stats-tab" class="tab-content">
+        <div class="section-title">🔮 Метрика интуиции (Чувство выстрела)</div>
+        <div class="predict-stat-box">
+            <div>🎯 Абсолютные попадания (100%): <strong id="exactPredicts">0</strong> выстр.</div>
+            <div>⚡ Близкие выстрелы (ошибка на 1): <strong id="closePredicts">0</strong> выстр.</div>
+            <div>📊 Индекс ментального контроля: <strong id="predictAccuracy">0%</strong></div>
+        </div>
+
+        <div class="section-title">🕸️ Паутина технических навыков</div>
+        <div class="spider-wrapper">
+            <!-- Пафосная цветная паутина, рисуемая кодом напрямую -->
+            <canvas id="spiderChart" width="280" height="280" class="spider-canvas"></canvas>
+        </div>
+
+        <div class="section-title">📈 Прогресс зачётных серий (Очки)</div>
+        <div class="card">
+            <div class="native-chart-container" id="scoreNativeChart"></div>
+        </div>
+
+        <div class="section-title">🕒 История зафиксированных тренировок</div>
+        <div id="historyLog"></div>
+    </div>
+
+    <div class="btn-save-container" id="globalSaveContainer">
+        <button class="btn-save" onclick="saveData()">💾 Записать тренировку</button>
+    </div>
+</div>
+<script>
+    let db = JSON.parse(localStorage.getItem('shootingProDB_v3')) || [];
+    let targetCount = 0;
+
+    // Автоматическая установка сегодняшней даты в календарь
+    document.getElementById('trainDate').valueAsDate = new Date();
+
+    function toggleWarmupStyle(label) {
+        setTimeout(() => {
+            const chk = label.querySelector('.warmup-check');
+            if(chk && chk.checked) { label.classList.add('active-warmup'); }
+            else { label.classList.remove('active-warmup'); }
+        }, 30);
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        if(tabId === 'input-tab') {
+            document.getElementById('btn-input').classList.add('active');
+            document.getElementById('globalSaveContainer').style.display = 'block';
+        } else {
+            document.getElementById('btn-stats').classList.add('active');
+            document.getElementById('globalSaveContainer').style.display = 'none';
+            renderCharts();
+        }
+    }
+
+    function addTargetRow() {
+        targetCount++;
+        const container = document.getElementById('targetsList');
+        const div = document.createElement('div');
+        div.className = 'target-box';
+        div.id = `target-box-${targetCount}`;
+        
+        let inputsHtml = '';
+        for(let i=1; i<=10; i++) {
+            inputsHtml += `
+                <div class="shot-pair">
+                    <span style="font-size:10px; color:#64748b; font-weight:bold;">В${i}</span>
+                    <input type="number" class="shot-input actual-shot" min="0" max="10" placeholder="Хит" oninput="calculateLiveTotal(${targetCount})">
+                    <input type="number" class="shot-input predict-shot" min="0" max="10" placeholder="Ванга" style="background-color: #f3e8ff; border-color: #d8b4fe; color: #6b21a8;">
+                </div>
+            `;
+        }
+
+        div.innerHTML = `
+            <div class="target-header">
+                <span>🎯 Мишень №${container.children.length + 1}</span>
+                <label class="warmup-toggle" onclick="setTimeout(()=> {const c=this.querySelector('.warmup-check-fire'); if(c&&c.checked){this.classList.add('active-warmup');}else{this.classList.remove('active-warmup');}},30)">
+                    <input type="checkbox" class="warmup-check-fire">🔧 Пристрелка
+                </label>
+            </div>
+            <div class="shots-grid">${inputsHtml}</div>
+            <div class="target-footer-info">
+                <span>Сумма: <strong id="total-live-${targetCount}">0</strong> / 100</span>
+                <span style="color: #ef4444; cursor: pointer; font-weight: bold;" onclick="removeTarget(${targetCount})">❌ Удалить</span>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeTarget(id) { document.getElementById(`target-box-${id}`).remove(); }
+
+    function calculateLiveTotal(id) {
+        const box = document.getElementById(`target-box-${id}`);
+        const inputs = box.querySelectorAll('.actual-shot');
+        let sum = 0;
+        inputs.forEach(i => {
+            let v = parseInt(i.value);
+            if(v > 10) i.value = 10;
+            if(v < 0 || isNaN(v)) v = 0;
+            sum += v;
+        });
+        document.getElementById(`total-live-${id}`).innerText = sum;
+    }
+</script>
+<script>
+    function saveData() {
+        const date = document.getElementById('trainDate').value;
+        const skillRows = document.querySelectorAll('.skill-row');
+        let savedSkills = [];
+        let savedTargets = [];
+
+        skillRows.forEach(row => {
+            const skillKey = row.getAttribute('data-skill');
+            const skillName = row.querySelector('.skill-name').textContent.trim();
+            const ratingVal = row.querySelector('.rating-select').value;
+            const isWarmup = row.querySelector('.warmup-check').checked;
+
+            if(ratingVal !== "") {
+                savedSkills.push({ key: skillKey, name: skillName, rating: parseInt(ratingVal), warmup: isWarmup });
+            }
+        });
+
+        const targetBoxes = document.querySelectorAll('.target-box');
+        let isError = false;
+        
+        targetBoxes.forEach(box => {
+            const actualInputs = box.querySelectorAll('.actual-shot');
+            const predictInputs = box.querySelectorAll('.predict-shot');
+            const isWarmup = box.querySelector('.warmup-check-fire').checked;
+            
+            let shots = [];
+            let predicts = [];
+            let total = 0;
+
+            for(let i=0; i<10; i++) {
+                let act = parseInt(actualInputs[i].value);
+                let prd = parseInt(predictInputs[i].value);
+
+                if (isNaN(act)) isError = true;
+
+                shots.push(act || 0);
+                predicts.push(isNaN(prd) ? null : prd);
+                total += (act || 0);
+            }
+
+            savedTargets.push({
+                shots: shots,
+                predicts: predicts,
+                total: total,
+                warmup: isWarmup
+            });
+        });
+
+        if (isError) {
+            alert('Бро, заполни все 10 зачётных ячеек выстрелов в каждой мишени!');
+            return;
+        }
+
+        if(savedSkills.length === 0 && savedTargets.length === 0) {
+            alert('Бро, заполни хотя бы один результат!');
+            return;
+        }
+
+        db.push({ id: Date.now(), date: date, skills: savedSkills, targets: savedTargets });
+        localStorage.setItem('shootingProDB_v3', JSON.stringify(db));
+
+        document.getElementById('targetsList').innerHTML = '';
+        targetCount = 0;
+        document.querySelectorAll('.rating-select').forEach(s => s.value = "");
+        document.querySelectorAll('.warmup-check, .warmup-check-fire').forEach(c => c.checked = false);
+        document.querySelectorAll('.warmup-toggle').forEach(l => l.classList.remove('active-warmup'));
+
+        alert('🎉 Данные сохранены!');
+    }
+
+    function renderCharts() {
+        const log = document.getElementById('historyLog');
+        log.innerHTML = '';
+
+        const scoreContainer = document.getElementById('scoreNativeChart');
+        scoreContainer.innerHTML = '';
+
+        let skillTotals = { holding: 0, sight: 0, trigger: 0, stance: 0 };
+        let skillCounts = { holding: 0, sight: 0, trigger: 0, stance: 0 };
+        
+        let exactMatches = 0;
+        let closeMatches = 0;
+        let totalPredictions = 0;
+        let totalScoreInPoints = 0;
+
+        db.forEach(session => {
+            session.targets.forEach((t, idx) => {
+                if(!t.warmup) {
+                    const row = document.createElement('div');
+                    row.className = 'chart-row';
+                    let targetText = "3 разряд";
+                    if(t.total >= 90) targetText = "Цель: 1 разряд 🔥";
+                    else if(t.total >= 85) targetText = "2 разряд 👍";
+
+                    row.innerHTML = `
+                        <div class="chart-label-container">
+                            <span>📅 ${session.date} (Мишень №${idx+1})</span>
+                            <span style="color:#2563eb; font-weight:bold;">${t.total} / 100 (${targetText})</span>
+                        </div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${t.total}%;"></div></div>
+                    `;
+                    scoreContainer.appendChild(row);
+                }
+                
+                for(let i=0; i<10; i++) {
+                    if(t.predicts[i] !== null) {
+                        totalPredictions++;
+                        let diff = Math.abs(t.predicts[i] - t.shots[i]);
+                        if(diff === 0) { exactMatches++; totalScoreInPoints += 100; }
+                        else if(diff === 1) { closeMatches++; totalScoreInPoints += 75; }
+                        else if(diff === 2) { totalScoreInPoints += 40; }
+                    }
+                }
+            });
+
+            session.skills.forEach(s => {
+                if(!s.warmup) {
+                    skillTotals[s.key] += s.rating;
+                    skillCounts[s.key]++;
+                }
+            });
+        });
+
+        document.getElementById('exactPredicts').innerText = exactMatches;
+        document.getElementById('closePredicts').innerText = closeMatches;
+        if(totalPredictions > 0) {
+            document.getElementById('predictAccuracy').innerText = Math.round(totalScoreInPoints / totalPredictions) + '%';
+        } else {
+            document.getElementById('predictAccuracy').innerText = '0%';
+        }
+
+        if(scoreContainer.children.length === 0) {
+            scoreContainer.innerHTML = '<div style="font-size:13px; color:#64748b; text-align:center; padding:10px;">Бро, запиши хотя бы одну зачётную серию!</div>';
+        }
+
+        // ОТРИСОВКА ПАФОСНОЙ НЕОНОВОЙ ПАУТИНКИ НА CANVAS НАПРЯМУЮ
+        const canvas = document.getElementById('spiderChart');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 280, 280);
+            
+            const centerX = 140, centerY = 140, radius = 90;
+            const skillsKeys = ['holding', 'sight', 'trigger', 'stance'];
+            const angleStep = (2 * Math.PI) / 4;
+
+            // Рисуем сетку паутины (5 кругов уровня)
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1;
+            for (let j = 1; j <= 5; j++) {
+                let curRadius = (radius / 5) * j;
+                ctx.beginPath();
+                for (let i = 0; i < 4; i++) {
+                    let angle = i * angleStep - Math.PI / 2;
+                    let x = centerX + curRadius * Math.cos(angle);
+                    let y = centerY + curRadius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            // Рисуем оси паутины
+            ctx.beginPath();
+            for (let i = 0; i < 4; i++) {
+                let angle = i * angleStep - Math.PI / 2;
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+            }
+            ctx.stroke();
+
+            // Собираем средние значения
+            let points = [];
+            skillsKeys.forEach((key, i) => {
+                let count = skillCounts[key];
+                let avg = count > 0 ? (skillTotals[key] / count) : 0;
+                let angle = i * angleStep - Math.PI / 2;
+                let curRadius = (radius / 10) * avg;
+                points.push({
+                    x: centerX + curRadius * Math.cos(angle),
+                    y: centerY + curRadius * Math.sin(angle)
+                });
+            });
+
+            // Рисуем цветное неоновое заполнение навыков стрелка
+            if(db.length > 0) {
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
+                ctx.strokeStyle = '#2563eb';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                points.forEach((p, i) => { if(i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                
+                // Ставим пафосные неоновые точки на углах
+                ctx.fillStyle = '#1d4ed8';
+                points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI); ctx.fill(); });
+            }
+        }
+
+        // Рендер истории (новые сверху)
+        [...db].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(session => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            let skillsText = session.skills.map(s => `${s.name}: ${s.rating}/10 ${s.warmup ? '(Пристр.)' : ''}`).join('<br>');
+            let targetsText = session.targets.map((t, idx) => {
+                let prCount = 0;
+                for(let i=0; i<10; i++) { if(t.predicts[i] === t.shots[i] && t.predicts[i] !== null) prCount++; }
+                return `Мишень №${idx+1}: <strong>${t.total} очков</strong> ${t.warmup ? '(Пристр.)' : ''} (Точно: ${prCount}/10)<br> Попадания: [${t.shots.join(', ')}]<br> Прогнозы: [${t.predicts.map(p=>p===null?'-':p).join(', ')}]`;
+            }).join('<br><br>');
+
+            div.innerHTML = `
+                <div class="history-date"><span>📅 ${session.date}</span><span style="color:#ef4444; cursor:pointer;" onclick="deleteSession(${session.id})">Удалить 🗑️</span></div>
+                <div class="history-details">${skillsText ? `<strong>Техника:</strong><br>${skillsText}<br><br>` : ''}${targetsText ? `<strong>Стрельба:</strong><br>${targetsText}` : ''}</div>
+            `;
+            log.appendChild(div);
+        });
+    }
+
+    function deleteSession(id) {
+        if(confirm('Удалить эту тренировку?')) {
+            db = db.filter(s => s.id !== id);
+            localStorage.setItem('shootingProDB_v3', JSON.stringify(db));
+            renderCharts();
+        }
+    }
+</script>
+</body>
+</html>
+
+
